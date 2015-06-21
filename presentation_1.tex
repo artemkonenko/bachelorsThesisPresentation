@@ -84,20 +84,52 @@
 \usepackage[russian,english]{babel}
 
 
+\setbeamertemplate{navigation symbols}{} % To remove the navigation symbols from the bottom of all slides uncomment this line
+
+
+\setbeamercolor{footline}{}
+\setbeamertemplate{footline}{
+  \leavevmode%
+  \hbox{%
+  \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,center]{}%
+    А. С. Коненко (Мехмат ЮФУ)
+  \end{beamercolorbox}%
+  \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,center]{}%
+    Ростов-на-Дону, 2015
+  \end{beamercolorbox}%
+  \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,right]{}%
+  Стр. \insertframenumber{} из \inserttotalframenumber \hspace*{2ex}
+  \end{beamercolorbox}}%
+  \vskip0pt%
+}
+
 %----------------------------------------------------------------------------------------
 %	TITLE PAGE
 %----------------------------------------------------------------------------------------
 
-\title[Анализ псевдонимов]{Анализ псевдонимов} % The short title appears at the bottom of every slide, the full title is only on the title page
+%\title[Анализ псевдонимов]{Оптимизация работы анализа псевдонимов в ОРС} % The short title appears at the bottom of every slide, the full title is only on the title page
 
-\author{Артём Коненко} % Your name
+%\author{Артём Коненко} % Your name
 %\institute[МехМат] % Your institution as it will appear on the bottom of every slide, may be shorthand to save space
 %{
 %МехМат \\ % Your institution for the title page
 %\medskip
 %\textit{yadummer@gmail.com} % Your email address
 %}
-\date{17.03.15} % \today % Date, can be changed to a custom date
+%\date{21.06.15} % \today % Date, can be changed to a custom date
+
+\title{\small{Оптимизация работы анализа псевдонимов в ОРС}}
+\vspace{15pt}%
+\author{\small{%
+А. С. Коненко\\%
+\emph{Направление подготовки:}~Фундаментальная информатика и \\информационные технологии\\%
+\emph{Научный руководитель:}~к.ф.-м.н., старший преподаватель Р.~Б.~Штейнберг}\\%
+\vspace{15pt}%
+    Южный федеральный университет\\
+    Институт математики, механики и компьютерных наук
+    имени~И.\,И.\,Воровича%
+}
+\date{\small{Ростов-на-Дону, 2015}}
 
 \begin{document}
 
@@ -106,7 +138,7 @@
 \end{frame}
 
 \begin{frame}
-\frametitle{План} % Table of contents slide, comment this block out to remove it
+\frametitle{Содержание} % Table of contents slide, comment this block out to remove it
 \tableofcontents % Throughout your presentation, if you choose to use \section{} and \subsection{} commands, these will automatically be printed on this slide as an overview of your presentation
 \end{frame}
 
@@ -114,9 +146,24 @@
 %	PRESENTATION SLIDES
 %----------------------------------------------------------------------------------------
 
-\section{Что такое и зачем}
+%-----------------------------------------------------------------------------------------
+%-----------------------------------------------------------------------------------------
+\section{Постановка задачи}
+%-----------------------------------------------------------------------------------------
 
-\subsection{Определение}
+\begin{frame}
+\frametitle{Постановка задачи}
+\begin{itemize}
+  \item \textbf{Обнаружить узкие места в существующей реализации анализа псевдонимов.} 
+  \item \textbf{Модифицировать существующие алгоритмы для ускорения анализа.} 
+  \item \textbf{Протестировать работу новой реализации анализа.} 
+\end{itemize}
+\end{frame}
+
+%-----------------------------------------------------------------------------------------
+%-----------------------------------------------------------------------------------------
+\section{Введение}
+%-----------------------------------------------------------------------------------------
 
 \begin{frame}
 \frametitle{Определение}
@@ -137,6 +184,8 @@ Cтатически (на этапе компиляции) определить 
 
 \end{frame}
 
+%-----------------------------------------------------------------------------------------
+
 \begin{frame}
 \frametitle{Почему анализ псевдонимов важен}
 
@@ -149,6 +198,8 @@ Cтатически (на этапе компиляции) определить 
 \end{block}
 
 \end{frame}
+
+%-----------------------------------------------------------------------------------------
 
 \begin{frame}
 \frametitle{Классификация анализов}
@@ -169,8 +220,9 @@ Cтатически (на этапе компиляции) определить 
 Анализ основан на анализе типов (для языков вроде Haskell или Java) или на анализе потока управления программы (для языков со ссылками и приведением типов).
 \end{block}
 
-
 \end{frame}
+
+%-----------------------------------------------------------------------------------------
 
 \subsection{Подходы к анализу в LLVM}
 
@@ -186,24 +238,36 @@ Cтатически (на этапе компиляции) определить 
 При использовании нескольких, анализы используются по цепочке, передавая свой результат следующему на вход.
 \end{frame}
 
+%-----------------------------------------------------------------------------------------
+%-----------------------------------------------------------------------------------------
 \section{Анализ псевдонимов в ОРС}
+%-----------------------------------------------------------------------------------------
 
 \begin{frame}
 \frametitle{Анализ псевдонимов в ОРС}
+
 \begin{block}{По классификации}
 Анализ псевдонимов в ОРС context-insensitive, flow-sensitive, field-sensitive (по умолчанию. Может быть и field-insensitive), flow-based.
 \end{block}
 
-\begin{block}{Использование}
-Среди преобразований реализацию анализа псевдонимов в ОРС использует только канонизация циклов.
-Это связано в первую очередь с очень долгой работой анализа.
-\end{block}
 \end{frame}
 
+%-----------------------------------------------------------------------------------------
+%-----------------------------------------------------------------------------------------
+\section{Реализация}
+%-----------------------------------------------------------------------------------------
+
 \begin{frame}
-\Huge{\centerline{Спасибо за внимание.}}
-\bigskip
-\large{\centerline{Вопросы.}}
+\frametitle{Полученное ускорение}
+
+\begin{block}{Оптимизация обхода ветвлений в управляющем графе}
+К сожалению, дала очень небольшой эффект и только на процедурах специального вида
+\end{block}
+
+\begin{block}{Оптимизация межпроцедурного анализа}
+Сильно сократила число повторных анализов.
+\end{block}
+
 \end{frame}
 
 %----------------------------------------------------------------------------------------
